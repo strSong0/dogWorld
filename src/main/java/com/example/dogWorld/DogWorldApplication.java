@@ -9,9 +9,6 @@ public class DogWorldApplication {
 
 	public static void main(String[] args) throws InterruptedException {
 		SpringApplication.run(DogWorldApplication.class, args);
-
-		Crawling crawling = new Crawling();
-		crawling.process();
 	}
 
 }

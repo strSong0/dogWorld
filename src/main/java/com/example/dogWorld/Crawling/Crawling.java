@@ -1,6 +1,7 @@
 package com.example.dogWorld.Crawling;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -11,19 +12,28 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class Crawling {
     private WebDriver driver;
-    private static final String url = "https://map.naver.com/p/search/24%EC%8B%9C%20%EB%8F%99%EB%AC%BC%EB%B3%91%EC%9B%90?c=15.00,0,0,2,dh";
 
-    public void process() throws InterruptedException {
+    public List<CrawlingDto> process(String cityName) throws InterruptedException {
 
         // 크롬 드라이버 경로
         System.setProperty("webdriver.chrome.driver", "C:\\Users\\sunba\\Downloads\\chromedriver-win64\\chromedriver-win64\\chromedriver.exe");
 
         driver = new ChromeDriver();
+        System.out.println(cityName);
+
+        String url = "https://map.naver.com/";
 
         // URL 로 이동
         driver.get(url);
+
+        // 도시명 검색
+        WebElement searchBox = driver.findElement(By.cssSelector(".input_search"));
+        searchBox.sendKeys(cityName + " 24시 동물병원", Keys.RETURN);
+
+        Thread.sleep(1000);
 
         // 아이프레임으로 전환
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -32,7 +42,7 @@ public class Crawling {
         List<WebElement> elements = driver.findElements(By.cssSelector(".place_bluelink.C6RjW"));
         System.out.println("elements.size() = " + elements.size());
 
-        List<String> addresses = new ArrayList<>();
+        List<CrawlingDto> hospitalInfoList = new ArrayList<>();
 
         for (int i = 0; i < elements.size(); i++) {
             WebElement element = elements.get(i);
@@ -54,26 +64,20 @@ public class Crawling {
             // entryIframe 내에서 작업 수행
             // (주소 크롤링) **********************
             List<WebElement> placeSectionContents = driver.findElements(By.cssSelector(".PkgBl"));
-
-            System.out.println("주소*******************************************");
-            System.out.println("사이즈 : " + placeSectionContents.size());
-
-            for (WebElement placeSectionContent : placeSectionContents) {
-                System.out.println(placeSectionContent.getText());
-                String address = placeSectionContent.getText();
-                addresses.add(address);
-            }
-
-            // (병원명 크롤링) **********************
             List<WebElement> nameSectionContents = driver.findElements(By.cssSelector(".Fc1rA"));
-            for (WebElement nameSectionContent : nameSectionContents) {
-                System.out.println(nameSectionContent.getText());
-            }
-
-            // (전화번호 크롤링) **********************
             List<WebElement> phoneSectionContents = driver.findElements(By.cssSelector(".xlx7Q"));
-            for (WebElement phoneSectionContent : phoneSectionContents) {
-                System.out.println(phoneSectionContent.getText());
+
+            System.out.println("요소 확인*******************************************");
+            System.out.println("사이즈 : " + placeSectionContents.size());
+            System.out.println("사이즈 : " + nameSectionContents.size());
+            System.out.println("사이즈 : " + phoneSectionContents.size());
+
+            for (int j = 0; j < placeSectionContents.size(); j++) {
+                CrawlingDto crawlingDto = new CrawlingDto();
+                crawlingDto.setAddress(placeSectionContents.get(j).getText());
+                crawlingDto.setName(nameSectionContents.get(j).getText());
+                crawlingDto.setPhoneNumber(phoneSectionContents.get(j).getText());
+                hospitalInfoList.add(crawlingDto);
             }
 
             // 최상위 컨텐츠로 이동
@@ -88,9 +92,6 @@ public class Crawling {
             // 다음 요소 찾기
             driver.findElements(By.cssSelector(".place_bluelink.C6RjW"));
         }
-
-        for (String address : addresses) {
-            System.out.println(address);
-        }
+        return hospitalInfoList;
     }
 }
