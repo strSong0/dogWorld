@@ -77,6 +77,14 @@ public class Crawling {
                 crawlingDto.setAddress(placeSectionContents.get(j).getText());
                 crawlingDto.setName(nameSectionContents.get(j).getText());
                 crawlingDto.setPhoneNumber(phoneSectionContents.get(j).getText());
+
+                // 좌표 설정
+                Coordinate coordinate = GeoCoding.geocode(crawlingDto.getAddress());
+                if (coordinate != null) {
+                    crawlingDto.setX(coordinate.getX());
+                    crawlingDto.setY(coordinate.getY());
+                }
+
                 hospitalInfoList.add(crawlingDto);
             }
 
