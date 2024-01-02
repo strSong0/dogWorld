@@ -1,4 +1,4 @@
-package com.example.dogWorld.Crawling;
+package com.example.dogWorld.crawling.service;
 
 public class Coordinate {
     private double x;

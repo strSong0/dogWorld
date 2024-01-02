@@ -1,5 +1,6 @@
-package com.example.dogWorld.Crawling;
+package com.example.dogWorld.crawling.service;
 
+import com.example.dogWorld.crawling.service.Coordinate;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -20,8 +21,8 @@ public class GeoCoding {
             URL url = new URL(apiURL);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            con.setRequestProperty("X-NCP-APIGW-API-KEY-ID", "sdasd");
-            con.setRequestProperty("X-NCP-APIGW-API-KEY", "asdas");
+            con.setRequestProperty("X-NCP-APIGW-API-KEY-ID", "2c2y74faqu");
+            con.setRequestProperty("X-NCP-APIGW-API-KEY", "HPnLjbQPo47UzJAbOrbwH63C7neU0ODSMzDrU0w3");
 
             int responseCode = con.getResponseCode();
 

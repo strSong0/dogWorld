@@ -1,7 +1,8 @@
-package com.example.dogWorld.Crawling;
+package com.example.dogWorld.crawling.controller;
 
+import com.example.dogWorld.crawling.dto.CrawlingResDto;
+import com.example.dogWorld.crawling.service.CrawlingService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,11 +15,14 @@ import java.util.List;
 @RequestMapping("/api")
 public class CrawlingController {
 
-    @Autowired
-    private CrawlingService crawlingService;
+    private final CrawlingService crawlingService;
+
+    public CrawlingController(CrawlingService crawlingService) {
+        this.crawlingService = crawlingService;
+    }
 
     @GetMapping("/crawl/{cityName}")
-    public List<CrawlingDto> crawlAndReturnInfo(@PathVariable String cityName) throws InterruptedException {
+    public List<CrawlingResDto> crawlAndReturnInfo(@PathVariable String cityName) throws InterruptedException {
         return crawlingService.crawlingProcess(cityName);
     }
 }
