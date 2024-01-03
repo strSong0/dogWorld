@@ -21,8 +21,8 @@ public class GeoCoding {
             URL url = new URL(apiURL);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            con.setRequestProperty("X-NCP-APIGW-API-KEY-ID", "2c2y74faqu");
-            con.setRequestProperty("X-NCP-APIGW-API-KEY", "HPnLjbQPo47UzJAbOrbwH63C7neU0ODSMzDrU0w3");
+            con.setRequestProperty("X-NCP-APIGW-API-KEY-ID", "sdasd");
+            con.setRequestProperty("X-NCP-APIGW-API-KEY", "asdas");
 
             int responseCode = con.getResponseCode();
 

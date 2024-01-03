@@ -46,7 +46,7 @@ public class Crawling {
         Thread.sleep(5000);
 
         // 아이프레임으로 전환
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(By.cssSelector("iframe#searchIframe")));
 
 

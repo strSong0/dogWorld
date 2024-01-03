@@ -19,7 +19,13 @@ public class WebDriverConfig {
 //        chromeOptions.addArguments("--disable-dev-shm-usage");
 //        chromeOptions.addArguments("--disable-gpu");
 //        chromeOptions.addArguments("--headless");
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless", "--disable-gpu","-no-sandbox");
+        options.addArguments("window-size=1920x1080");
+        options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+        options.addArguments("lang=ko_KR");
 
-        return new ChromeDriver();
+
+        return new ChromeDriver(options);
     }
 }
