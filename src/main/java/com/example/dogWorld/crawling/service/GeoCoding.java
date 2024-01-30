@@ -4,6 +4,7 @@ import com.example.dogWorld.crawling.service.Coordinate;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -12,8 +13,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 public class GeoCoding {
-
     public static Coordinate geocode(String address) {
+
         try {
             String encodedAddress = URLEncoder.encode(address, "UTF-8");
 
@@ -21,8 +22,8 @@ public class GeoCoding {
             URL url = new URL(apiURL);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            con.setRequestProperty("X-NCP-APIGW-API-KEY-ID", "sdasd");
-            con.setRequestProperty("X-NCP-APIGW-API-KEY", "asdas");
+            con.setRequestProperty("X-NCP-APIGW-API-KEY-ID", "adsfasfafa");
+            con.setRequestProperty("X-NCP-APIGW-API-KEY", "fadfdfadfdsfsad");
 
             int responseCode = con.getResponseCode();
 
