@@ -14,7 +14,7 @@ public class DogWorldApplication {
 		SpringApplication.run(DogWorldApplication.class, args);
 	}
 
-	// CORS
+//	// CORS
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
