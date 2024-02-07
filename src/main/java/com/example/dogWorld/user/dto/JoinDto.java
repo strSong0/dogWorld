@@ -29,5 +29,4 @@ public class JoinDto {
 
     @NotBlank(message = "이미지는 필수입니다.")
     private String url;
-
 }

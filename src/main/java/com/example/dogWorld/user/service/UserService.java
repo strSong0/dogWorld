@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,36 +35,48 @@ public class UserService implements UserDetailsManager {
     private final CloudinaryService cloudinaryService;
 
 
-    public JwtTokenInfoDto loginUser(LoginDto request) {
+    public ResponseEntity<Object> loginUser(LoginDto request) {
+        Optional<User> optionalUser = userRepository.findByUsername(request.getUsername());
+        if (optionalUser.isEmpty()) {
+            String message = String.format("존재하지 않는 사용자입니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+        }
         CustomUserDetails user = this.loadUserByUsername(request.getUsername());
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");
+            String message = String.format("비밀번호가 일치하지 않습니다.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
         }
         String token = String.valueOf(jwtTokenUtils.generateToken(user.getUsername()));
         UserProfile userProfile = readUser(request.getUsername());
-        return new JwtTokenInfoDto(token, userProfile);
+        JwtTokenInfoDto jwtTokenInfoDto = new JwtTokenInfoDto(token, userProfile);
+        return ResponseEntity.ok(jwtTokenInfoDto);
     }
 
-    public JwtTokenInfoDto createUserWithJtw(UserDetails user) {
+    public ResponseEntity<Object> createUserWithJtw(UserDetails user) {
         CustomUserDetails customUserDetails = (CustomUserDetails) user;
         log.info("회원가입서비스");
-        if (this.userExists(customUserDetails.getUsername()))
-            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("%s 는 이미 사용중인 아이디 입니다.", customUserDetails.getUsername()));
-        if (userRepository.existsByEmail(customUserDetails.getEmail()))
-            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format("%s 는 이미 사용중인 이메일 입니다.", customUserDetails.getEmail()));
+        if (this.userExists(customUserDetails.getUsername())) {
+            String message = String.format("%s 는 이미 사용중인 아이디 입니다.", customUserDetails.getUsername());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+        }
+        if (userRepository.existsByEmail(customUserDetails.getEmail())) {
+            String message = String.format("%s 는 이미 사용중인 이메일 입니다.", customUserDetails.getEmail());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+        }
         try {
             customUserDetails.setEncodedPassword(passwordEncoder.encode(customUserDetails.getPassword()));
             this.userRepository.save(User.fromUserDetails(customUserDetails));
         } catch (ClassCastException e) {
             log.error("Exception message : {} | failed to cast to {}", e.getMessage(), CustomUserDetails.class);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 내부 오류 발생");
         }
         log.info("회원가입서비스 종료");
 
         String token = String.valueOf(jwtTokenUtils.generateToken(customUserDetails.getUsername()));
         UserProfile userProfile = readUser(customUserDetails.getUsername());
 
-        return new JwtTokenInfoDto(token, userProfile);
+        JwtTokenInfoDto jwtTokenInfoDto = new JwtTokenInfoDto(token, userProfile);
+        return ResponseEntity.ok(jwtTokenInfoDto);
     }
 
     public UserProfile readUser(String username) {
@@ -72,25 +85,6 @@ public class UserService implements UserDetailsManager {
             return UserProfile.fromEntity(optionalUser.get());
         else throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
-
-//    public UserProfile updateUser2(UserDetails user) {
-//        CustomUserDetails updatedUserDetails = (CustomUserDetails) user;
-//
-//        String username = SecurityContextHolder
-//                .getContext()
-//                .getAuthentication()
-//                .getName();
-//
-//        Optional<User> optionalUser = userRepository.findByUsername(username);
-//        if (optionalUser.isEmpty())
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-//        User foundUser = optionalUser.get();
-//
-//        foundUser.update(updatedUserDetails);
-//        userRepository.save(foundUser);
-//
-//        return UserProfile.fromEntity(foundUser);
-//    }
 
     public UserProfile updateUser2(String name, String username, MultipartFile profileImage) throws IOException {
 

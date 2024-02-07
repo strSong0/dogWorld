@@ -33,8 +33,3 @@ cloudinary:
   api_key: ${CLOUDINARY_API_KEY}
   api_secret: ${CLOUDINARY_API_SECRET}
 
-naver:
-  secret-key-id: 2c2y74faqu
-  secret-key: HPnLjbQPo47UzJAbOrbwH63C7neU0ODSMzDrU0w3
-
-

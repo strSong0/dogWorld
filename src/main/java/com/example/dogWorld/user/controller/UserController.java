@@ -10,6 +10,7 @@ import com.example.dogWorld.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -26,26 +27,29 @@ public class UserController {
     private final UserService userService;
 
     //로그인
-//    @PostMapping("/login")
-//    public JwtTokenInfoDto login(@RequestBody @Valid LoginDto request){
-//        JwtTokenInfoDto jwtTokenInfoDto = userService.loginUser(request);
-//        return jwtTokenInfoDto;
-//    }
     @PostMapping("/login")
-    public JwtTokenInfoDto login(@RequestBody @Valid LoginDto request){
+    public ResponseEntity<?> login(@RequestBody @Valid LoginDto request){
         return userService.loginUser(request);
     }
 
     //회원가입
     @PostMapping("/signup")
-    public JwtTokenInfoDto join(@RequestBody @Valid JoinDto request) {
+    public ResponseEntity<?> join(@RequestBody @Valid JoinDto request) {
         log.info("요청들어옴");
         log.info(String.valueOf(request));
-        if (!request.getPasswordCheck().equals(request.getPassword()))
-            throw new CustomException(ErrorCode.DIFF_PASSWORD_CHECK, String.format("Username : %s", request.getUsername()));
-        JwtTokenInfoDto jwtTokenInfoDto = userService.createUserWithJtw(CustomUserDetails.fromDto(request));
-        log.info("토큰리턴 전");
-        return jwtTokenInfoDto;
+
+        if (!request.getPasswordCheck().equals(request.getPassword())) {
+            String errorMessage = String.format("확인용 비밀번호가 일치하지 않습니다.: %s", request.getUsername());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        }
+        try {
+            ResponseEntity<Object> jwtTokenInfoDto = userService.createUserWithJtw(CustomUserDetails.fromDto(request));
+            log.info("토큰리턴 전");
+            return ResponseEntity.ok(jwtTokenInfoDto);
+        } catch (CustomException e) {
+            String errorMessage = e.getMessage();
+            return ResponseEntity.status(e.getErrorCode().getStatus()).body(errorMessage);
+        }
     }
 
     //회원정보 조회
@@ -57,12 +61,6 @@ public class UserController {
     }
 
     //회원정보 수정
-//    @PutMapping("/update")
-//    public UserProfile update(@RequestBody UpdateProfileDto updateDto) {
-//        UserProfile userProfile = userService.updateUser2(CustomUserDetails.fromDto(updateDto));
-//        return userProfile;
-//    }
-
     @PutMapping("/me")
     public UserProfile update(@RequestParam(name = "name", required = false) String name,
                               @RequestPart(name = "image", required = false) MultipartFile multipartFile,
@@ -82,28 +80,4 @@ public class UserController {
         responseDto.setStatus(HttpStatus.OK);
         return responseDto;
     }
-
-
-
-
-
-
-
-
-
-
-
-//    @PostMapping("/signup")
-//    public ResponseDto join(@RequestBody @Valid JoinDto request) {
-//        log.info("요청들어옴");
-//        if (!request.getPasswordCheck().equals(request.getPassword()))
-//            throw new CustomException(ErrorCode.DIFF_PASSWORD_CHECK, String.format("Username : %s", request.getUsername()));
-//        userService.createUser(CustomUserDetails.fromDto(request));
-//        ResponseDto responseDto = new ResponseDto();
-//        responseDto.setMessage("회원가입이 완료되었습니다.");
-//        responseDto.setStatus(HttpStatus.OK);
-//        log.info("토큰리턴 전");
-//        return responseDto;
-//    }
-
 }
