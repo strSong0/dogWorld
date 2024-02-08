@@ -1,11 +1,9 @@
 package com.example.dogWorld.user.controller;
 
 import com.example.dogWorld.global.CustomException;
-import com.example.dogWorld.global.ErrorCode;
 import com.example.dogWorld.global.ResponseDto;
+import com.example.dogWorld.global.ValidationSequence;
 import com.example.dogWorld.user.dto.*;
-import com.example.dogWorld.jwt.JwtTokenInfoDto;
-import com.example.dogWorld.user.entity.User;
 import com.example.dogWorld.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,7 +33,7 @@ public class UserController {
 
     //회원가입
     @PostMapping("/signup")
-    public ResponseEntity<?> join(@RequestBody @Valid JoinDto request) {
+    public ResponseEntity<?> join(@RequestBody @Validated(ValidationSequence.class) JoinDto request) {
         log.info("요청들어옴");
         log.info(String.valueOf(request));
 
