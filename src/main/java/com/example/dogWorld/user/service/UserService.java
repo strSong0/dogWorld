@@ -1,5 +1,6 @@
 package com.example.dogWorld.user.service;
 
+import com.example.dogWorld.global.ResponseDto;
 import com.example.dogWorld.jwt.JwtTokenInfoDto;
 import com.example.dogWorld.jwt.JwtTokenUtils;
 import com.example.dogWorld.user.dto.CustomUserDetails;
@@ -55,13 +56,19 @@ public class UserService implements UserDetailsManager {
     public ResponseEntity<Object> createUserWithJtw(UserDetails user) {
         CustomUserDetails customUserDetails = (CustomUserDetails) user;
         log.info("회원가입서비스");
-        if (this.userExists(customUserDetails.getUsername())) {
+        if (userRepository.existsByUsername(customUserDetails.getUsername())) {
             String message = String.format("%s 는 이미 사용중인 아이디 입니다.", customUserDetails.getUsername());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+            ResponseDto responseDto = new ResponseDto();
+            responseDto.setMessage(message);
+            responseDto.setStatus(HttpStatus.CONFLICT);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(responseDto);
         }
         if (userRepository.existsByEmail(customUserDetails.getEmail())) {
             String message = String.format("%s 는 이미 사용중인 이메일 입니다.", customUserDetails.getEmail());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+            ResponseDto responseDto = new ResponseDto();
+            responseDto.setMessage(message);
+            responseDto.setStatus(HttpStatus.CONFLICT);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(responseDto);
         }
         try {
             customUserDetails.setEncodedPassword(passwordEncoder.encode(customUserDetails.getPassword()));

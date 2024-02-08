@@ -28,6 +28,5 @@ public class JoinDto {
     @Pattern(regexp = "^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "이메일 형식이 잘못되었습니다.", groups = ValidationGroups.EmailValidationGroup.class)
     private String email;
 
-    @NotBlank(message = "이미지는 필수입니다.", groups = ValidationGroups.ImageValidationGroup.class)
     private String url;
 }

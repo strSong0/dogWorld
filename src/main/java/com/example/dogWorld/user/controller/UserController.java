@@ -36,15 +36,17 @@ public class UserController {
     public ResponseEntity<?> join(@RequestBody @Validated(ValidationSequence.class) JoinDto request) {
         log.info("요청들어옴");
         log.info(String.valueOf(request));
-
         if (!request.getPasswordCheck().equals(request.getPassword())) {
             String errorMessage = String.format("확인용 비밀번호가 일치하지 않습니다.: %s", request.getUsername());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+            ResponseDto responseDto = new ResponseDto();
+            responseDto.setMessage(errorMessage);
+            responseDto.setStatus(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
         }
         try {
             ResponseEntity<Object> jwtTokenInfoDto = userService.createUserWithJtw(CustomUserDetails.fromDto(request));
             log.info("토큰리턴 전");
-            return ResponseEntity.ok(jwtTokenInfoDto);
+            return jwtTokenInfoDto;
         } catch (CustomException e) {
             String errorMessage = e.getMessage();
             return ResponseEntity.status(e.getErrorCode().getStatus()).body(errorMessage);
