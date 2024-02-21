@@ -24,7 +24,7 @@ public class WebSecurityConfig {
 //                .formLogin(FormLoginConfigurer::disable)
 //                .logout(LogoutConfigurer::disable)
                 .authorizeHttpRequests(authHttp -> authHttp
-                .requestMatchers("/no-auth","/auth/signup" ,"/auth/login","/auth/me", "/auth/**", "/api/**")
+                .requestMatchers("/no-auth","/auth/signup" ,"/auth/login","/auth/me", "/auth/**", "/api/**", "/posts/**")
                 .permitAll()
                 .requestMatchers("/re-auth" )
                 .authenticated()

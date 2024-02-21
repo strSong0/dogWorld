@@ -2,6 +2,7 @@ package com.example.dogWorld.user.entity;
 
 import com.example.dogWorld.user.dto.CustomUserDetails;
 import com.example.dogWorld.user.dto.UpdateProfileDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -15,13 +16,16 @@ import lombok.NoArgsConstructor;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long id;
     @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @Column(nullable = false, unique = true)
+    @JsonIgnore
     private String email;
     @Column(nullable = false, unique = true)
     private String name;
@@ -60,9 +64,9 @@ public class User {
 //        }
 
     public void update(UpdateProfileDto request){
-    if (request.getEmail() != null) {
-        this.email = request.getEmail();
-    }
+        if (request.getEmail() != null) {
+            this.email = request.getEmail();
+        }
         if (request.getName() != null) {
             this.name = request.getName();
         }
