@@ -40,12 +40,18 @@ public class UserService implements UserDetailsManager {
         Optional<User> optionalUser = userRepository.findByUsername(request.getUsername());
         if (optionalUser.isEmpty()) {
             String message = String.format("존재하지 않는 사용자입니다.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+            ResponseDto responseDto = new ResponseDto();
+            responseDto.setMessage(message);
+            responseDto.setStatus(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
         }
         CustomUserDetails user = this.loadUserByUsername(request.getUsername());
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             String message = String.format("비밀번호가 일치하지 않습니다.");
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
+            ResponseDto responseDto = new ResponseDto();
+            responseDto.setMessage(message);
+            responseDto.setStatus(HttpStatus.CONFLICT);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(responseDto);
         }
         String token = String.valueOf(jwtTokenUtils.generateToken(user.getUsername()));
         UserProfile userProfile = readUser(request.getUsername());

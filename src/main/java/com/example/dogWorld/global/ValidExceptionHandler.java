@@ -26,5 +26,4 @@ public class ValidExceptionHandler {
         // 클라이언트에게 오류 메시지 응답으로 반환
         return ResponseEntity.badRequest().body(responseDto);
     }
-
 }

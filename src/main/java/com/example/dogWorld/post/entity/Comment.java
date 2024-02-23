@@ -33,9 +33,10 @@ public class Comment {
     private User user;
 
     @Builder
-    public Comment(String text,User user, Post post){
+    public Comment(String text,User user, Post post, LocalDateTime createAt){
         this.text = text;
         this.user = user;
         this.post = post;
+        this.createdAt = createAt;
     }
 }

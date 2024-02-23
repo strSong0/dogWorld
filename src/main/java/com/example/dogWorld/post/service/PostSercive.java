@@ -1,5 +1,6 @@
 package com.example.dogWorld.post.service;
 
+import com.example.dogWorld.post.dto.CommentDto;
 import com.example.dogWorld.post.dto.CreateCommentDto;
 import com.example.dogWorld.post.entity.Comment;
 import com.example.dogWorld.post.entity.Post;
@@ -15,8 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,9 +31,10 @@ public class PostSercive {
     private final CloudinaryService cloudinaryService;
 
     //게시글 작성
-    public Post createPost(String text, MultipartFile multipartFile, String createAt, String username) throws IOException {
+    public Post createPost(String text, MultipartFile multipartFile, String username) throws IOException {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
         String url = cloudinaryService.uploadImage(multipartFile);
+        LocalDateTime createAt = LocalDateTime.now();
 
         Post post = Post.builder()
                 .text(text)
@@ -65,18 +69,25 @@ public class PostSercive {
     }
 
     //댓글 작성
-    public List<Comment> createComment(CreateCommentDto text, Long postId, String username) {
+    public List<CommentDto> createComment(CreateCommentDto text, Long postId, String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
         Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("포스트를 찾을 수 없습니다."));
+        LocalDateTime createAt = LocalDateTime.now();
+
         Comment comment = Comment.builder()
                 .text(text.getText())
                 .post(post)
                 .user(user)
+                .createAt(createAt)
                 .build();
 
         commentRepository.save(comment);
-        return post.getComments();
+
+        return post.getComments().stream()
+                .map(CommentDto::convertToDto)
+                .collect(Collectors.toList());
     }
+
 
     //게시글 수정
     public Post updatePost(Long postId, String text, MultipartFile multipartFile) throws IOException {

@@ -1,11 +1,12 @@
 package com.example.dogWorld.post.controller;
 
+import com.example.dogWorld.post.dto.CommentDto;
 import com.example.dogWorld.post.dto.CreateCommentDto;
-import com.example.dogWorld.post.entity.Comment;
 import com.example.dogWorld.post.entity.Post;
 import com.example.dogWorld.post.service.PostSercive;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -23,24 +24,26 @@ public class PostController {
     private final PostSercive postService;
 
     @PostMapping
-    public Post createPost(@RequestParam(name = "text", required = true) String text,
-                       @RequestPart(name = "image", required = true) MultipartFile multipartFile,
-                       @RequestParam(name = "createAt", required = false) String createAt,
-                       @AuthenticationPrincipal UserDetails userDetails
-    ) throws IOException {
+    public ResponseEntity<?> createPost(
+            @RequestParam(name = "text", required = true) String text,
+            @RequestPart(name = "file", required = true) MultipartFile multipartFile,
+            @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+
         String username = userDetails.getUsername();
         log.info(username);
-        return postService.createPost(text, multipartFile, createAt, username);
+        Post post = postService.createPost(text, multipartFile, username);
+        return ResponseEntity.ok(post);
     }
 
-    @GetMapping("/get")
-    public List<Post> getAllPost() {
-        return postService.getAllPost();
-    }
+
 
     @GetMapping
-    public List<Post> getAllPostByUser(@RequestParam(name = "username") String username){
-        return postService.getAllPostByUser(username);
+    public List<Post> getPosts(@RequestParam(name = "username", required = false) String username) {
+        if (username != null) {
+            return postService.getAllPostByUser(username);
+        } else {
+            return postService.getAllPost();
+        }
     }
 
     @GetMapping("{id}")
@@ -49,9 +52,9 @@ public class PostController {
     }
 
     @PostMapping("{id}/comments")
-    public List<Comment> createComment(@PathVariable("id") Long postId ,
-                                       @RequestBody CreateCommentDto text,
-                                       @AuthenticationPrincipal UserDetails userDetails)
+    public List<CommentDto> createComment(@PathVariable("id") Long postId ,
+                                          @RequestBody CreateCommentDto text,
+                                          @AuthenticationPrincipal UserDetails userDetails)
     {
         String username = userDetails.getUsername();
         return postService.createComment(text, postId, username);

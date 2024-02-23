@@ -39,10 +39,10 @@ public class Post {
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
-    public Post(String text, String fileUrl, String createAt, User user) {
+    public Post(String text, String fileUrl, LocalDateTime createAt, User user) {
         this.text = text;
         this.fileUrl = fileUrl;
-        this.createdAt = LocalDateTime.parse(createAt);
+        this.createdAt = createAt;
         this.user = user;
     }
 
