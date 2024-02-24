@@ -2,6 +2,7 @@ package com.example.dogWorld.post.service;
 
 import com.example.dogWorld.post.dto.CommentDto;
 import com.example.dogWorld.post.dto.CreateCommentDto;
+import com.example.dogWorld.post.dto.PostDto;
 import com.example.dogWorld.post.entity.Comment;
 import com.example.dogWorld.post.entity.Post;
 import com.example.dogWorld.post.repository.CommentRepository;
@@ -31,41 +32,53 @@ public class PostSercive {
     private final CloudinaryService cloudinaryService;
 
     //게시글 작성
-    public Post createPost(String text, MultipartFile multipartFile, String username) throws IOException {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    public PostDto createPost(String text, MultipartFile multipartFile, String username) throws IOException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
         String url = cloudinaryService.uploadImage(multipartFile);
-        LocalDateTime createAt = LocalDateTime.now();
+        LocalDateTime createdAt = LocalDateTime.now();
 
         Post post = Post.builder()
                 .text(text)
                 .fileUrl(url)
-                .createAt(createAt)
+                .createAt(createdAt)
                 .user(user)
                 .build();
-        return postRepository.save(post);
+
+        Post savedPost = postRepository.save(post);
+        return PostDto.convertToDto(savedPost);
     }
 
-    //모든 게시글 반환
-    public List<Post> getAllPost() {
-        return postRepository.findAll();
+    // 모든 게시글 반환
+    public List<PostDto> getAllPost() {
+        List<Post> postList = postRepository.findAllByOrderByCreatedAtDesc();
+        return postList.stream()
+                .map(PostDto::convertToDto)
+                .collect(Collectors.toList());
     }
 
-    //유저가 작성한 게시글
-    public List<Post> getAllPostByUser(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    //유저가 작성한 게시글 반환
+    public List<PostDto> getAllPostByUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
         List<Post> postList = postRepository.findByUser(user);
 
         if (postList.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "글이 없습니다.");
-        return postList;
+
+        return postList.stream()
+                .map(PostDto::convertToDto)
+                .collect(Collectors.toList());
     }
 
     //게시글 id로 조회
-    public Optional<Post> getAllPostById(Long postId) {
+    public Optional<PostDto> getAllPostById(Long postId) {
         Optional<Post> optionalPost = postRepository.findById(postId);
         if (optionalPost.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 id의 글이 없습니다.");
-        return optionalPost;
+        return optionalPost.map(PostDto::convertToDto);
     }
 
     //댓글 작성
@@ -90,13 +103,13 @@ public class PostSercive {
 
 
     //게시글 수정
-    public Post updatePost(Long postId, String text, MultipartFile multipartFile) throws IOException {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("포스트를 찾을 수 없습니다."));
+    public PostDto updatePost(Long postId, String text, MultipartFile multipartFile) throws IOException {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("포스트를 찾을 수 없습니다."));
         String url = cloudinaryService.uploadImage(multipartFile);
-
-        post.updatePost(text,url);
-
-        return postRepository.save(post);
+        post.updatePost(text, url);
+        Post updatedPost = postRepository.save(post);
+        return PostDto.convertToDto(updatedPost);
     }
 
     //게시글 삭제

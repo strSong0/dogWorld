@@ -2,7 +2,7 @@ package com.example.dogWorld.post.controller;
 
 import com.example.dogWorld.post.dto.CommentDto;
 import com.example.dogWorld.post.dto.CreateCommentDto;
-import com.example.dogWorld.post.entity.Post;
+import com.example.dogWorld.post.dto.PostDto;
 import com.example.dogWorld.post.service.PostSercive;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,14 +31,14 @@ public class PostController {
 
         String username = userDetails.getUsername();
         log.info(username);
-        Post post = postService.createPost(text, multipartFile, username);
+        PostDto post = postService.createPost(text, multipartFile, username);
         return ResponseEntity.ok(post);
     }
 
 
 
     @GetMapping
-    public List<Post> getPosts(@RequestParam(name = "username", required = false) String username) {
+    public List<PostDto> getPosts(@RequestParam(name = "username", required = false) String username) {
         if (username != null) {
             return postService.getAllPostByUser(username);
         } else {
@@ -47,7 +47,7 @@ public class PostController {
     }
 
     @GetMapping("{id}")
-    public Optional<Post> getAllPostById(@PathVariable("id") Long postId){
+    public Optional<PostDto> getAllPostById(@PathVariable("id") Long postId){
         return postService.getAllPostById(postId);
     }
 
@@ -61,9 +61,9 @@ public class PostController {
     }
 
     @PutMapping("{id}")
-    public Post updatePost(@PathVariable("id") Long postId,
-                           @RequestParam(name = "text", required = true) String text,
-                            @RequestPart(name = "image", required = true) MultipartFile multipartFile) throws IOException {
+    public PostDto updatePost(@PathVariable("id") Long postId,
+                              @RequestParam(name = "text", required = true) String text,
+                              @RequestPart(name = "image", required = true) MultipartFile multipartFile) throws IOException {
         return postService.updatePost(postId, text, multipartFile);
     }
 
