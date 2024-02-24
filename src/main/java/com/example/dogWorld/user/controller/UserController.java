@@ -64,7 +64,7 @@ public class UserController {
     //회원정보 수정
     @PutMapping("/me")
     public UserProfile update(@RequestParam(name = "name", required = false) String name,
-                              @RequestPart(name = "image", required = false) MultipartFile multipartFile,
+                              @RequestPart(name = "file", required = false) MultipartFile multipartFile,
                               @AuthenticationPrincipal UserDetails userDetails) throws IOException {
         String username = userDetails.getUsername();
         UserProfile userProfile = userService.updateUser2(name, username, multipartFile);
