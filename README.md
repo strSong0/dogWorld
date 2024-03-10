@@ -61,3 +61,23 @@ username, name, 프로필사진url 반환
 ##### 24시 동물병원 정보 조회
 cityName과 셀레니움을 통하여 해당 cityName 에 맞는 24시간 동물병원 정보와 좌표를 크롤링하여 DB에 저장한다. 이때 이미 동물병원의 데이터가 DB에 저장이 되어 있다면 크롤링을 하지 않고 DB의 정보를 가져다 쓴다.
 
+#### 게시글, 댓글
+ 기능 | HTTP METHOD | URL
+ --- | ----------- | ---
+ 아이디로 게시글 조회 | GET | /posts?username={username}
+ 전체 게시글 조회 | GET | /posts
+ 게시글 아이디로 조회 | GET | /posts/{postId}
+ 게시글 작성 | POST | /posts
+ 게시글 수정 | PUT | /posts/{postId}
+ 게시글 삭제 | DELETE | /posts/{postId}
+ 댓글 작성 | POST | /posts/{postId}/comments
+
+##### 게시글 조회
+postDto 형태로 반환
+
+##### 게시글 작성
+게시글 작성시 text, image 는 필수 요구사항
+
+##### 댓글 작성
+CommentDto 형태로 반환
+
